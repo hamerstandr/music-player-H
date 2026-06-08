@@ -1,10 +1,14 @@
 ```
-# Build outputs
+# Build artifacts
 bin/
 obj/
-out/
-dist/
-build/
+*.exe
+*.dll
+*.pdb
+*.nupkg
+*.snupkg
+**/Debug/
+**/Release/
 
 # Dependencies
 packages/
@@ -17,22 +21,19 @@ vendor/
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# IDE
+# Editors
 .vscode/
 .idea/
-*.userprefs
-*.user
+*.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Artifacts
-*.dll
-*.exe
-*.pdb
-*.nupkg
-*.snupkg
+# User-specific files
+**/user-settings.json
+**/*.userprefs
 ```

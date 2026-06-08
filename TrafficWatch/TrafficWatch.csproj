@@ -4,7 +4,6 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>TrafficWatch</AssemblyName>
@@ -13,25 +12,30 @@
     <Authors>TrafficWatch Team</Authors>
     <Company>TrafficWatch</Company>
     <Product>TrafficWatch Dashboard</Product>
-    <Description>Advanced system monitoring dashboard with extensible addon system</Description>
+    <Description>Advanced system monitoring dashboard with extensible addon system - Download Manager, Music Player, System Monitor</Description>
     <Copyright>© 2024 TrafficWatch Team</Copyright>
+    <ApplicationIcon>Resources\app.ico</ApplicationIcon>
+    <NeutralLanguage>fa-IR</NeutralLanguage>
     
     <!-- تنظیمات پابلیش -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <PublishReadyToRun>true</PublishReadyToRun>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
-
+  
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <Optimize>true</Optimize>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <DefineConstants>RELEASE;TRACE</DefineConstants>
   </PropertyGroup>
-
+  
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,6 +49,7 @@
   <ItemGroup>
     <!-- فایل‌های منابع -->
     <Resource Include="Resources\**\*.*" />
+    <None Remove="Resources\**\*.*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,6 +58,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Update="View\**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- فایل‌های محلی‌سازی -->
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
