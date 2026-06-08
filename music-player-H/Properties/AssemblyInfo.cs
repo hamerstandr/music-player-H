@@ -2,14 +2,14 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
-// اطلاعات عمومی اسمبلی
-[assembly: AssemblyTitle("MusicPlayerH")]
-[assembly: AssemblyDescription("Advanced system monitoring dashboard with extensible addon system - Download Manager, Music Player, System Monitor")]
+// اطلاعات عمومی اسمبلی - Music Player H
+[assembly: AssemblyTitle("Music Player H")]
+[assembly: AssemblyDescription("Professional Music Player with advanced streaming, playlist management, and multi-language support (Farsi, English, Arabic)")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MusicPlayerH Team")]
-[assembly: AssemblyProduct("MusicPlayerH Dashboard")]
-[assembly: AssemblyCopyright("© 2024 MusicPlayerH Team. All rights reserved.")]
-[assembly: AssemblyTrademark("MusicPlayerH")]
+[assembly: AssemblyCompany("Music Player H Team")]
+[assembly: AssemblyProduct("Music Player H - حرفه‌ای")]
+[assembly: AssemblyCopyright("© 2024 Music Player H Team. All rights reserved.")]
+[assembly: AssemblyTrademark("Music Player H")]
 [assembly: AssemblyCulture("")]
 
 // تنظیمات ComVisible
