@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using TrafficWatch.Models.Dashboard;
 using TrafficWatch.Services.Dashboard;
+using Forms = System.Windows.Forms;
 
 namespace TrafficWatch.View.Dashboard
 {
@@ -282,13 +283,13 @@ namespace TrafficWatch.View.Dashboard
         /// </summary>
         private async void BtnAddFolder_Click(object sender, RoutedEventArgs e)
         {
-            var folderDialog = new System.Windows.Forms.FolderBrowserDialog
+            var folderDialog = new Forms.FolderBrowserDialog
             {
                 Description = "Select folder containing media files",
                 ShowNewFolderButton = false
             };
             
-            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (folderDialog.ShowDialog() == Forms.DialogResult.OK)
             {
                 string[] extensions = { ".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a", ".mp4", ".mkv", ".avi", ".mov", ".wmv" };
                 var files = Directory.GetFiles(folderDialog.SelectedPath)
