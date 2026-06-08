@@ -1,39 +1,8 @@
 ```
 # Build artifacts
-bin/
-obj/
-*.exe
-*.dll
-*.pdb
-*.nupkg
-*.snupkg
-**/Debug/
-**/Release/
+BUILD_INSTRUCTIONS.md
+PROJECT_SUMMARY.md
+QUICK_START.md
+build.ps1
 
-# Dependencies
-packages/
-node_modules/
-vendor/
-
-# Logs
-*.log
-
-# Environment
-.env
-.env.local
-.env.*
-
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# User-specific files
-**/user-settings.json
-**/*.userprefs
 ```
