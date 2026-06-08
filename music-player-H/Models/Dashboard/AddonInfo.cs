@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TrafficWatch.Models.Dashboard
+namespace MusicPlayerH.Models.Dashboard
 {
     /// <summary>
     /// کلاس پایه برای اطلاعات افزونه‌های داشبورد

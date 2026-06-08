@@ -1,6 +1,6 @@
 using System;
 
-namespace TrafficWatch.Models.Dashboard
+namespace MusicPlayerH.Models.Dashboard
 {
     /// <summary>
     /// مدل اطلاعات ترک موسیقی/ویدئو

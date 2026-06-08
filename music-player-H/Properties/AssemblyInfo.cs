@@ -3,13 +3,13 @@ using System.Resources;
 using System.Runtime.InteropServices;
 
 // اطلاعات عمومی اسمبلی
-[assembly: AssemblyTitle("TrafficWatch")]
+[assembly: AssemblyTitle("MusicPlayerH")]
 [assembly: AssemblyDescription("Advanced system monitoring dashboard with extensible addon system - Download Manager, Music Player, System Monitor")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("TrafficWatch Team")]
-[assembly: AssemblyProduct("TrafficWatch Dashboard")]
-[assembly: AssemblyCopyright("© 2024 TrafficWatch Team. All rights reserved.")]
-[assembly: AssemblyTrademark("TrafficWatch")]
+[assembly: AssemblyCompany("MusicPlayerH Team")]
+[assembly: AssemblyProduct("MusicPlayerH Dashboard")]
+[assembly: AssemblyCopyright("© 2024 MusicPlayerH Team. All rights reserved.")]
+[assembly: AssemblyTrademark("MusicPlayerH")]
 [assembly: AssemblyCulture("")]
 
 // تنظیمات ComVisible

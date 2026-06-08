@@ -6,11 +6,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
-using TrafficWatch.Models.Dashboard;
-using TrafficWatch.Services.Dashboard;
+using MusicPlayerH.Models.Dashboard;
+using MusicPlayerH.Services.Dashboard;
 using Forms = System.Windows.Forms;
 
-namespace TrafficWatch.View.Dashboard
+namespace MusicPlayerH.View.Dashboard
 {
     /// <summary>
     /// Interaction logic for MusicPlayerTab.xaml

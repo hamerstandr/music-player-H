@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using TrafficWatch.Models.Dashboard;
+using MusicPlayerH.Models.Dashboard;
 
-namespace TrafficWatch.Services.Dashboard
+namespace MusicPlayerH.Services.Dashboard
 {
     /// <summary>
     /// سرویس مدیریت افزونه‌های داشبورد
@@ -41,7 +41,7 @@ namespace TrafficWatch.Services.Dashboard
             _addons = new List<AddonInfo>();
             _configPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "TrafficWatch",
+                "MusicPlayerH",
                 "addons_config.json"
             );
         }
@@ -86,22 +86,10 @@ namespace TrafficWatch.Services.Dashboard
         /// </summary>
         private void RegisterDefaultAddons()
         {
-            // Download Manager Addon
-            if (!_addons.Any(a => a.Id == "download-manager"))
-            {
-                _addons.Add(new DownloadManagerAddonInfo());
-            }
-
-            // Music Player Addon
+            // Music Player Addon (اصلی - همیشه فعال)
             if (!_addons.Any(a => a.Id == "music-player"))
             {
                 _addons.Add(new MusicPlayerAddonInfo());
-            }
-
-            // System Monitor Addon
-            if (!_addons.Any(a => a.Id == "system-monitor"))
-            {
-                _addons.Add(new SystemMonitorAddonInfo());
             }
         }
 
@@ -164,24 +152,8 @@ namespace TrafficWatch.Services.Dashboard
             {
                 bool wasInstalled = addon.IsInstalled;
 
-                // بررسی وضعیت نصب بر اساس نوع افزونه
-                switch (addon.Id)
-                {
-                    case "download-manager":
-                        addon.IsInstalled = await CheckDownloadManagerInstalledAsync();
-                        break;
-                    case "music-player":
-                        // موزیک پلیر داخلی است، همیشه نصب محسوب می‌شود
-                        addon.IsInstalled = true;
-                        break;
-                    case "system-monitor":
-                        // مانیتور سیستم داخلی است
-                        addon.IsInstalled = true;
-                        break;
-                    default:
-                        addon.IsInstalled = false;
-                        break;
-                }
+                // موزیک پلیر داخلی است، همیشه نصب محسوب می‌شود
+                addon.IsInstalled = true;
 
                 // ارسال رویداد در صورت تغییر وضعیت
                 if (wasInstalled != addon.IsInstalled)
@@ -199,26 +171,6 @@ namespace TrafficWatch.Services.Dashboard
                 System.Diagnostics.Debug.WriteLine($"Error scanning addon {addon.Id}: {ex.Message}");
                 addon.IsInstalled = false;
             }
-        }
-
-        /// <summary>
-        /// بررسی نصب بودن Download Manager
-        /// </summary>
-        private async Task<bool> CheckDownloadManagerInstalledAsync()
-        {
-            return await Task.Run(() =>
-            {
-                // مسیرهای معمول نصب
-                var possiblePaths = new[]
-                {
-                    @"C:\Program Files\DownloadMenger2\DownloadMenger2.exe",
-                    @"C:\Program Files (x86)\DownloadMenger2\DownloadMenger2.exe",
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "DownloadMenger2", "DownloadMenger2.exe"),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "DownloadMenger2", "DownloadMenger2.exe")
-                };
-
-                return possiblePaths.Any(File.Exists);
-            });
         }
 
         /// <summary>
@@ -337,8 +289,7 @@ namespace TrafficWatch.Services.Dashboard
         public void RemoveCustomAddon(string id)
         {
             var addon = GetAddonById(id);
-            if (addon != null && !_addons.Any(a => a.Id == id && 
-                (a is DownloadManagerAddonInfo || a is MusicPlayerAddonInfo || a is SystemMonitorAddonInfo)))
+            if (addon != null)
             {
                 _addons.Remove(addon);
                 OnAddonsUpdated?.Invoke(this, EventArgs.Empty);

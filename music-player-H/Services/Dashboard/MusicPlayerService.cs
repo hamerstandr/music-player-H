@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using TrafficWatch.Models.Dashboard;
+using MusicPlayerH.Models.Dashboard;
 
-namespace TrafficWatch.Services.Dashboard
+namespace MusicPlayerH.Services.Dashboard
 {
     /// <summary>
     /// سرویس مدیریت پخش موسیقی و ویدئو

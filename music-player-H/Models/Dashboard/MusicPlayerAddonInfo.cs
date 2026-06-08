@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using TrafficWatch.Models.Dashboard;
+using MusicPlayerH.Models.Dashboard;
 
-namespace TrafficWatch.Models.Dashboard
+namespace MusicPlayerH.Models.Dashboard
 {
     /// <summary>
     /// مدل اطلاعات افزونه پخش کننده موسیقی
@@ -14,7 +14,7 @@ namespace TrafficWatch.Models.Dashboard
             Name = "Music Player";
             Description = "Professional music and video player with streaming capabilities";
             Version = "1.0.0";
-            Author = "TrafficWatch Team";
+            Author = "MusicPlayerH Team";
             ApiPort = 9091; // پورت اختصاصی موزیک پلیر
             DisplayOrder = 2; // نمایش بعد از دانلود منیجر
             

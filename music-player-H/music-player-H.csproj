@@ -6,18 +6,18 @@
     <UseWPF>true</UseWPF>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>TrafficWatch</AssemblyName>
-    <RootNamespace>TrafficWatch</RootNamespace>
+    <AssemblyName>music-player-H</AssemblyName>
+    <RootNamespace>MusicPlayerH</RootNamespace>
     <Version>2.0.0</Version>
-    <Authors>TrafficWatch Team</Authors>
-    <Company>TrafficWatch</Company>
-    <Product>TrafficWatch Dashboard</Product>
-    <Description>Advanced system monitoring dashboard with extensible addon system - Download Manager, Music Player, System Monitor</Description>
-    <Copyright>© 2024 TrafficWatch Team</Copyright>
+    <Authors>Music Player H Team</Authors>
+    <Company>Music Player H</Company>
+    <Product>Music Player H - حرفه‌ای</Product>
+    <Description>Professional Music Player with advanced streaming, playlist management, and multi-language support (Farsi, English, Arabic)</Description>
+    <Copyright>© 2024 Music Player H Team</Copyright>
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
     <NeutralLanguage>fa-IR</NeutralLanguage>
     
-    <!-- تنظیمات پابلیش -->
+    <!-- Publish Settings -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <PublishReadyToRun>true</PublishReadyToRun>
@@ -39,7 +39,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- بسته‌های مورد نیاز -->
+    <!-- Required Packages -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
@@ -47,13 +47,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- فایل‌های منابع -->
+    <!-- Resource Files -->
     <Resource Include="Resources\**\*.*" />
     <None Remove="Resources\**\*.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- صفحات و کنترل‌ها -->
+    <!-- Pages and Controls -->
     <Page Update="View\**\*.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -64,7 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- فایل‌های محلی‌سازی -->
+    <!-- Localization Files -->
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

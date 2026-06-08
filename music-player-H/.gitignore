@@ -1,0 +1,47 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.csproj.user
+
+# Rider
+.idea/
+
+# PDB files (optional)
+*.pdb
+
+# Publish output
+publish/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Test results
+TestResults/
+coverage/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup files
+*.bak
+*~
