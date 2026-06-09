@@ -1,35 +1,39 @@
 ```
 # Build artifacts
-bin/
-obj/
-out/
+*.obj
 *.exe
 *.dll
 *.pdb
-*.nupkg
-**/Debug/
-**/Release/
+*.user
+*.userosscache
+*.suo
+*.cache
+*.ilk
+*.exp
+*.lib
+*.iobj
+*.ipdb
+*.builds
+*.pidb
+*.runtimeconfig.dev.json
 
-# Dependencies
+# Packages
+*.nupkg
+*.snupkg
 packages/
-node_modules/
-vendor/
+bin/
+obj/
 
 # Logs
 *.log
 
-# Environment
-.env
-.env.local
-.env.*
-
-# Editors
+# User-specific files
+.vs/
+.vshost.exe
+.vshost.exe.config
+.vshost.exe.manifest
 .vscode/
-.idea/
-*.swp
-*.swo
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Configuration files
+*.userprefs
 ```
