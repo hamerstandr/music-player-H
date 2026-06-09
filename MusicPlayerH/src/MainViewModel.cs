@@ -2,14 +2,14 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
-using System.Timers;
+using Timers = System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LibVLCSharp.Shared;
 using Newtonsoft.Json;
-using MusicPlayerH.Models;
+using MediaTrack = MusicPlayerH.Models.MediaTrack;
 
 namespace MusicPlayerH.Services
 {
@@ -17,8 +17,8 @@ namespace MusicPlayerH.Services
     {
         private readonly LibVLC _libVLC;
         private readonly MediaPlayer _mediaPlayer;
-        private Timer? _positionTimer;
-        private Timer? _heartbeatTimer;
+        private Timers.Timer? _positionTimer;
+        private Timers.Timer? _heartbeatTimer;
         private bool _isTrafficWatchConnected;
         private readonly LanguageService _languageService;
 
