@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MusicPlayerH.Models.Dashboard;
+using MusicPlayerH.Services.PluginSystem;
 
 namespace MusicPlayerH.Services.Dashboard
 {
@@ -20,6 +21,7 @@ namespace MusicPlayerH.Services.Dashboard
         private readonly List<AddonInfo> _addons;
         private readonly string _configPath;
         private bool _isInitialized;
+        private NamedPipePluginServer _pluginServer;
 
         /// <summary>
         /// نمونه یکتای سرویس
@@ -35,6 +37,11 @@ namespace MusicPlayerH.Services.Dashboard
         /// رویداد بروزرسانی لیست افزونه‌ها
         /// </summary>
         public event EventHandler OnAddonsUpdated;
+        
+        /// <summary>
+        /// رویداد دریافت داده از افزونه‌ها (از طریق Named Pipe)
+        /// </summary>
+        public event EventHandler<PluginDataReceivedEventArgs> OnDataReceived;
 
         private DashboardAddonService()
         {
@@ -49,7 +56,7 @@ namespace MusicPlayerH.Services.Dashboard
         /// <summary>
         /// مقداردهی اولیه سرویس
         /// </summary>
-        public void Initialize()
+        public async void Initialize()
         {
             if (_isInitialized) return;
 
@@ -70,6 +77,9 @@ namespace MusicPlayerH.Services.Dashboard
 
                 // بررسی وضعیت نصب افزونه‌ها
                 _ = ScanAllAddonsAsync();
+                
+                // شروع سرور Named Pipe برای ارتباط با افزونه‌ها
+                await StartPluginServerAsync();
 
                 _isInitialized = true;
                 
@@ -79,6 +89,39 @@ namespace MusicPlayerH.Services.Dashboard
             {
                 System.Diagnostics.Debug.WriteLine($"Error initializing DashboardAddonService: {ex.Message}");
             }
+        }
+        
+        /// <summary>
+        /// شروع سرور Named Pipe برای ارتباط با افزونه‌ها
+        /// </summary>
+        private async Task StartPluginServerAsync()
+        {
+            try
+            {
+                _pluginServer = new NamedPipePluginServer();
+                
+                // اتصال رویداد دریافت داده به هندلر داخلی
+                _pluginServer.OnDataReceived += PluginServer_OnDataReceived;
+                
+                await _pluginServer.StartAsync();
+                
+                System.Diagnostics.Debug.WriteLine("NamedPipePluginServer started on TrafficWatchPluginPipe");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error starting plugin server: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// هندلر دریافت داده از سرور Named Pipe
+        /// </summary>
+        private void PluginServer_OnDataReceived(object sender, PluginDataReceivedEventArgs e)
+        {
+            // ارسال رویداد به مشترکین خارجی
+            OnDataReceived?.Invoke(this, e);
+            
+            System.Diagnostics.Debug.WriteLine($"Data received from addon {e.AddonId}: {e.Data}");
         }
 
         /// <summary>
@@ -294,6 +337,19 @@ namespace MusicPlayerH.Services.Dashboard
                 _addons.Remove(addon);
                 OnAddonsUpdated?.Invoke(this, EventArgs.Empty);
                 _ = SaveAddonsAsync();
+            }
+        }
+        
+        /// <summary>
+        /// توقف سرور Named Pipe
+        /// </summary>
+        public async Task StopPluginServerAsync()
+        {
+            if (_pluginServer != null)
+            {
+                await _pluginServer.StopAsync();
+                _pluginServer.Dispose();
+                _pluginServer = null;
             }
         }
     }

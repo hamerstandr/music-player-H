@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using MusicPlayerH.Models.Dashboard;
+using MusicPlayerH.Services.PluginSystem;
 
 namespace MusicPlayerH.Services.Dashboard
 {
@@ -55,6 +56,105 @@ namespace MusicPlayerH.Services.Dashboard
             _shuffle = false;
             _repeatMode = "none";
             _playbackState = PlaybackState.Stopped;
+            
+            // اتصال به رویداد دریافت داده از Named Pipe
+            DashboardAddonService.Instance.OnDataReceived += DashboardAddonService_OnDataReceived;
+        }
+        
+        /// <summary>
+        /// هندلر دریافت داده از افزونه‌ها از طریق Named Pipe
+        /// </summary>
+        private void DashboardAddonService_OnDataReceived(object sender, PluginDataReceivedEventArgs e)
+        {
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(e.Data);
+                var root = doc.RootElement;
+                
+                if (root.TryGetProperty("type", out var typeElement))
+                {
+                    string dataType = typeElement.GetString();
+                    
+                    if (dataType == "now_playing")
+                    {
+                        // بروزرسانی اطلاعات آهنگ در حال پخش از افزونه
+                        UpdateNowPlayingFromPlugin(root);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error processing plugin data: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// بروزرسانی اطلاعات آهنگ از داده‌های دریافتی از افزونه
+        /// </summary>
+        private void UpdateNowPlayingFromPlugin(System.Text.Json.JsonElement root)
+        {
+            var previousTrack = _currentTrack;
+            
+            _currentTrack = new MediaTrackInfo
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = root.TryGetProperty("title", out var title) ? title.GetString() : "Unknown",
+                Artist = root.TryGetProperty("artist", out var artist) ? artist.GetString() : "Unknown Artist",
+                Album = root.TryGetProperty("album", out var album) ? album.GetString() : "Unknown Album",
+                Duration = root.TryGetProperty("duration", out var duration) ? ParseDuration(duration.GetString()) : 0,
+                CurrentPosition = root.TryGetProperty("progress", out var progress) ? progress.GetInt32() : 0,
+                MediaType = "Audio"
+            };
+            
+            bool isPlaying = root.TryGetProperty("isPlaying", out var playing) && playing.GetBoolean();
+            _playbackState = isPlaying ? PlaybackState.Playing : PlaybackState.Paused;
+            
+            // ارسال رویداد تغییر ترک
+            if (previousTrack?.Title != _currentTrack.Title)
+            {
+                OnTrackChanged?.Invoke(this, new TrackChangedEventArgs
+                {
+                    Track = _currentTrack,
+                    PreviousTrack = previousTrack
+                });
+            }
+            
+            // ارسال رویداد تغییر وضعیت پخش
+            OnPlaybackStateChanged?.Invoke(this, new PlaybackStateChangedEventArgs
+            {
+                State = _playbackState,
+                Track = _currentTrack
+            });
+        }
+        
+        /// <summary>
+        /// تبدیل رشته مدت زمان به ثانیه
+        /// </summary>
+        private int ParseDuration(string durationStr)
+        {
+            if (string.IsNullOrEmpty(durationStr)) return 0;
+            
+            try
+            {
+                // فرمت mm:ss یا hh:mm:ss
+                var parts = durationStr.Split(':');
+                if (parts.Length == 2)
+                {
+                    int minutes = int.Parse(parts[0]);
+                    int seconds = int.Parse(parts[1]);
+                    return minutes * 60 + seconds;
+                }
+                else if (parts.Length == 3)
+                {
+                    int hours = int.Parse(parts[0]);
+                    int minutes = int.Parse(parts[1]);
+                    int seconds = int.Parse(parts[2]);
+                    return hours * 3600 + minutes * 60 + seconds;
+                }
+            }
+            catch { }
+            
+            return 0;
         }
         
         /// <summary>
