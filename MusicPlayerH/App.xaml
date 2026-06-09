@@ -5,32 +5,65 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <!-- Merge Language Resources (Default: Persian) -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="src/Resources/Languages/fa.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
             <!-- Converters -->
             <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
             <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
 
-            <!-- Colors -->
+            <!-- Colors - Modern Dark Theme -->
             <Color x:Key="PrimaryColor">#1DB954</Color>
             <Color x:Key="PrimaryDarkColor">#1ed760</Color>
+            <Color x:Key="PrimaryLightColor">#27f570</Color>
             <Color x:Key="BackgroundColor">#121212</Color>
+            <Color x:Key="BackgroundGradientColor">#1a1a2e</Color>
             <Color x:Key="SurfaceColor">#181818</Color>
             <Color x:Key="SurfaceHoverColor">#282828</Color>
+            <Color x:Key="SurfaceElevatedColor">#242424</Color>
             <Color x:Key="TextColor">#FFFFFF</Color>
             <Color x:Key="TextSecondaryColor">#B3B3B3</Color>
+            <Color x:Key="TextMutedColor">#727272</Color>
             <Color x:Key="ConnectedColor">#1DB954</Color>
             <Color x:Key="DisconnectedColor">#FF5252</Color>
+            <Color x:Key="AccentColor">#BB86FC</Color>
+            <Color x:Key="ErrorColor">#CF6679</Color>
 
             <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
             <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDarkColor}"/>
+            <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource PrimaryLightColor}"/>
             <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+            <SolidColorBrush x:Key="BackgroundGradientBrush" Color="{StaticResource BackgroundGradientColor}"/>
             <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}"/>
             <SolidColorBrush x:Key="SurfaceHoverBrush" Color="{StaticResource SurfaceHoverColor}"/>
+            <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{StaticResource SurfaceElevatedColor}"/>
             <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
             <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}"/>
+            <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}"/>
             <SolidColorBrush x:Key="ConnectedBrush" Color="{StaticResource ConnectedColor}"/>
             <SolidColorBrush x:Key="DisconnectedBrush" Color="{StaticResource DisconnectedColor}"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+            <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
 
-            <!-- Button Style -->
+            <!-- Gradient Brushes -->
+            <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#1DB954" Offset="0"/>
+                <GradientStop Color="#1ed760" Offset="1"/>
+            </LinearGradientBrush>
+            
+            <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#121212" Offset="0"/>
+                <GradientStop Color="#1a1a2e" Offset="1"/>
+            </LinearGradientBrush>
+
+            <!-- Shadow Effect -->
+            <DropShadowEffect x:Key="CardShadow" BlurRadius="10" ShadowDepth="2" Opacity="0.3" Color="#000000"/>
+            <DropShadowEffect x:Key="ButtonShadow" BlurRadius="8" ShadowDepth="1" Opacity="0.4" Color="#000000"/>
+            <DropShadowEffect x:Key="GlowEffect" BlurRadius="15" ShadowDepth="0" Opacity="0.5" Color="#1DB954"/>
+
+            <!-- Button Style - Modern with Glow -->
             <Style x:Key="ModernButton" TargetType="Button">
                 <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
                 <Setter Property="Foreground" Value="White"/>
@@ -39,20 +72,24 @@
                 <Setter Property="FontSize" Value="14"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
                 <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Effect" Value="{StaticResource ButtonShadow}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border Background="{TemplateBinding Background}" 
                                     CornerRadius="25" 
-                                    Padding="{TemplateBinding Padding}">
+                                    Padding="{TemplateBinding Padding}"
+                                    Effect="{TemplateBinding Effect}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Background" Value="{StaticResource PrimaryDarkBrush}"/>
+                                    <Setter Property="Effect" Value="{StaticResource GlowEffect}"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter Property="Background" Value="#14833b"/>
+                                    <Setter Property="Effect" Value="{x:Null}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -60,7 +97,7 @@
                 </Setter>
             </Style>
 
-            <!-- Icon Button Style -->
+            <!-- Icon Button Style - Enhanced -->
             <Style x:Key="IconButton" TargetType="Button">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
@@ -73,12 +110,19 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border Background="{TemplateBinding Background}" 
-                                    CornerRadius="25">
+                                    CornerRadius="25"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Background" Value="{StaticResource SurfaceHoverBrush}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryLightBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                                    <Setter Property="Foreground" Value="White"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -86,18 +130,51 @@
                 </Setter>
             </Style>
 
-            <!-- ListBox Item Style -->
+            <!-- Play Button - Large with Gradient -->
+            <Style x:Key="PlayButton" TargetType="Button" BasedOn="{StaticResource IconButton}">
+                <Setter Property="Width" Value="65"/>
+                <Setter Property="Height" Value="65"/>
+                <Setter Property="FontSize" Value="32"/>
+                <Setter Property="Background" Value="{StaticResource PrimaryGradient}"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Effect" Value="{StaticResource GlowEffect}"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.7" Color="#1DB954"/>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- ListBox Item Style - Enhanced -->
             <Style x:Key="PlaylistItemStyle" TargetType="ListBoxItem">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
-                <Setter Property="Padding" Value="10,8"/>
+                <Setter Property="Padding" Value="12,10"/>
+                <Setter Property="Margin" Value="2"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListBoxItem">
                             <Border Background="{TemplateBinding Background}" 
                                     Padding="{TemplateBinding Padding}"
-                                    CornerRadius="5">
+                                    Margin="{TemplateBinding Margin}"
+                                    CornerRadius="8"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Effect" Value="{x:Null}"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Effect" Value="{StaticResource CardShadow}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <ContentPresenter/>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -106,6 +183,7 @@
                                 </Trigger>
                                 <Trigger Property="IsSelected" Value="True">
                                     <Setter Property="Background" Value="#282828"/>
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryLightBrush}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -113,10 +191,80 @@
                 </Setter>
             </Style>
 
-            <!-- ScrollBar Style -->
+            <!-- ScrollBar Style - Modern Thin -->
             <Style TargetType="ScrollBar">
                 <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Width" Value="8"/>
+                <Setter Property="Width" Value="6"/>
+                <Setter Property="MinWidth" Value="6"/>
+            </Style>
+
+            <!-- Slider Style - Modern -->
+            <Style TargetType="Slider">
+                <Setter Property="Background" Value="{StaticResource SurfaceHoverBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                <Setter Property="Height" Value="20"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Slider">
+                            <Grid>
+                                <Track x:Name="PART_Track">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Command="Slider.DecreaseLarge" Style="{x:Null}">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate>
+                                                    <Border Background="{TemplateBinding Foreground}" 
+                                                            CornerRadius="3" 
+                                                            Height="4"/>
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="Slider.IncreaseLarge" Style="{x:Null}">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate>
+                                                    <Border Background="{TemplateBinding Background}" 
+                                                            CornerRadius="3" 
+                                                            Height="4"/>
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Width="16" Height="16">
+                                            <Thumb.Template>
+                                                <ControlTemplate>
+                                                    <Ellipse Fill="{StaticResource PrimaryBrush}" 
+                                                             Stroke="White" 
+                                                             StrokeThickness="2"
+                                                             Effect="{StaticResource ButtonShadow}"/>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- TextBlock Styles -->
+            <Style x:Key="HeadingText" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="24"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            </Style>
+
+            <Style x:Key="SubheadingText" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            </Style>
+
+            <Style x:Key="CaptionText" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

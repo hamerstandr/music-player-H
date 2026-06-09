@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,6 +20,7 @@ namespace MusicPlayerH.Services
         private Timer? _positionTimer;
         private Timer? _heartbeatTimer;
         private bool _isTrafficWatchConnected;
+        private readonly LanguageService _languageService;
 
         [ObservableProperty]
         private ObservableCollection<MediaTrack> _playlist = new();
@@ -53,11 +55,22 @@ namespace MusicPlayerH.Services
         [ObservableProperty]
         private string _nowPlayingText = "No track selected";
 
+        [ObservableProperty]
+        private bool _isLanguageMenuOpen;
+
+        [ObservableProperty]
+        private string _currentLanguageDisplay = "فارسی";
+
         // Expose MediaPlayer for VideoView
         public MediaPlayer MediaPlayer => _mediaPlayer;
 
         public MainViewModel()
         {
+            // Initialize Language Service
+            _languageService = LanguageService.Instance;
+            _languageService.Initialize();
+            _currentLanguageDisplay = _languageService.CurrentLanguageName;
+
             // Initialize LibVLC for audio and video support
             Core.Initialize();
             _libVLC = new LibVLC(enableDebugLogs: false);
@@ -318,6 +331,67 @@ namespace MusicPlayerH.Services
         {
             if (!_mediaPlayer.IsPlaying) return;
             _mediaPlayer.Position = (float)(value / 100.0);
+        }
+
+        partial void OnCurrentLanguageDisplayChanged(string value)
+        {
+            // Update UI texts when language changes
+            UpdateUiTexts();
+        }
+
+        private void UpdateUiTexts()
+        {
+            // Update connection status based on current language
+            ConnectionStatus = IsTrafficWatchConnected 
+                ? GetLocalizedString("ConnectedStatus") 
+                : GetLocalizedString("DisconnectedStatus");
+            
+            NowPlayingText = CurrentTrack != null 
+                ? $"{CurrentTrack.Title} - {CurrentTrack.Artist}" 
+                : GetLocalizedString("NoTrackSelected");
+        }
+
+        private string GetLocalizedString(string key)
+        {
+            try
+            {
+                if (Application.Current.Resources[key] is string value)
+                {
+                    return value;
+                }
+            }
+            catch { }
+            return key;
+        }
+
+        [RelayCommand]
+        private void SetLanguageFA()
+        {
+            _languageService.LoadLanguage(SupportedLanguage.FA);
+            CurrentLanguageDisplay = _languageService.CurrentLanguageName;
+            IsLanguageMenuOpen = false;
+        }
+
+        [RelayCommand]
+        private void SetLanguageAR()
+        {
+            _languageService.LoadLanguage(SupportedLanguage.AR);
+            CurrentLanguageDisplay = _languageService.CurrentLanguageName;
+            IsLanguageMenuOpen = false;
+        }
+
+        [RelayCommand]
+        private void SetLanguageEN()
+        {
+            _languageService.LoadLanguage(SupportedLanguage.EN);
+            CurrentLanguageDisplay = _languageService.CurrentLanguageName;
+            IsLanguageMenuOpen = false;
+        }
+
+        [RelayCommand]
+        private void ToggleLanguageMenu()
+        {
+            IsLanguageMenuOpen = !IsLanguageMenuOpen;
         }
 
         private async Task SendNowPlayingAsync()
