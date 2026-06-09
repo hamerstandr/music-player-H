@@ -4,28 +4,51 @@
 *.exe
 *.dll
 *.pdb
+*.user
+*.aps
+*.ilk
+*.iobj
+*.ipdb
+*.tlog
+*.exp
+*.lib
+*.so
+*.dylib
+
+# Visual Studio files
+*.suo
+*.userosscache
+*.sln.docstates
 *.userprefs
-*.cache
-*.log
-*.tmp
+
+# Visual Studio Code files
+.vscode/
+
+# Output directory
+bin/
+obj/
+Debug/
+Release/
+x64/
+x86/
+Debug*/
+Release*/
 
 # Dependencies
 packages/
-bin/
-obj/
+node_modules/
+
+# Logs
+*.log
 
 # Environment
 .env
 .env.local
 *.env.*
 
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
 ```
