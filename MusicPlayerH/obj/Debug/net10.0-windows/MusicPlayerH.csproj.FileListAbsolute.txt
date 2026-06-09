@@ -1,0 +1,11 @@
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\MusicPlayerH.csproj.AssemblyReference.cache
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\MainWindow.baml
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\src\Resources\Languages\ar.baml
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\src\Resources\Languages\en.baml
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\src\Resources\Languages\fa.baml
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\MainWindow.g.cs
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\App.g.cs
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\MusicPlayerH_Content.g.cs
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\MusicPlayerH_MarkupCompile.cache
+C:\Users\hamed-lab\Documents\GitHub\music-player-H\MusicPlayerH\obj\Debug\net10.0-windows\MusicPlayerH_MarkupCompile.lref

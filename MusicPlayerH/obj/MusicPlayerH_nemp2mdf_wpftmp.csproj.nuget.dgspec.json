@@ -54,27 +54,27 @@
           "dependencies": {
             "CommunityToolkit.Mvvm": {
               "target": "Package",
-              "version": "[8.4.2, )"
+              "version": "[8.2.2, )"
             },
             "LibVLCSharp.WPF": {
               "target": "Package",
-              "version": "[3.9.7.1, )"
+              "version": "[3.8.5, )"
             },
             "LibVLCSharp.WinForms": {
               "target": "Package",
-              "version": "[3.9.7.1, )"
+              "version": "[3.8.5, )"
             },
             "NAudio": {
               "target": "Package",
-              "version": "[2.3.0, )"
+              "version": "[2.2.1, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[13.0.4, )"
+              "version": "[13.0.3, )"
             },
             "VideoLAN.LibVLC.Windows": {
               "target": "Package",
-              "version": "[3.0.23.1, )"
+              "version": "[3.0.20, )"
             }
           },
           "imports": [

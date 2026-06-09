@@ -11,6 +11,7 @@ using LibVLCSharp.Shared;
 using Newtonsoft.Json;
 using MediaTrack = MusicPlayerH.Models.MediaTrack;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace MusicPlayerH.Services
 {
