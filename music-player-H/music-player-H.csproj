@@ -20,8 +20,7 @@
     <!-- .NET 10 & Visual Studio 2026 Optimizations -->
     <LangVersion>preview</LangVersion>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <TrimMode>link</TrimMode>
-    <PublishTrimmed>true</PublishTrimmed>
+    <PublishTrimmed>false</PublishTrimmed>
     
     <!-- Publish Settings -->
     <PublishSingleFile>true</PublishSingleFile>
