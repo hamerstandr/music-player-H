@@ -5,7 +5,7 @@
     <!-- English -->
     
     <!-- Window Title -->
-    <sys:String x:Key="WindowTitle">Music Player H - Professional Music & Video Player</sys:String>
+    <sys:String x:Key="WindowTitle">Music Player H - Professional Music &amp; Video Player</sys:String>
     
     <!-- Header -->
     <sys:String x:Key="HeaderTitle">🎵 Music Player H</sys:String>
