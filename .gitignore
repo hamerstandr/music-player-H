@@ -1,42 +1,19 @@
 ```
 # Build artifacts
-*.obj
+bin/
+obj/
+out/
 *.exe
 *.dll
 *.pdb
-*.user
-*.aps
-*.ilk
-*.iobj
-*.ipdb
-*.tlog
-*.exp
-*.lib
-*.so
-*.dylib
-
-# Visual Studio files
-*.suo
-*.userosscache
-*.sln.docstates
-*.userprefs
-
-# Visual Studio Code files
-.vscode/
-
-# Output directory
-bin/
-obj/
-Debug/
-Release/
-x64/
-x86/
-Debug*/
-Release*/
+*.nupkg
+**/Debug/
+**/Release/
 
 # Dependencies
 packages/
 node_modules/
+vendor/
 
 # Logs
 *.log
@@ -44,11 +21,15 @@ node_modules/
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # OS generated files
 .DS_Store
 Thumbs.db
-desktop.ini
-$RECYCLE.BIN/
 ```

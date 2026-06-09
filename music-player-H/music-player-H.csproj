@@ -17,6 +17,12 @@
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
     <NeutralLanguage>fa-IR</NeutralLanguage>
     
+    <!-- .NET 10 & Visual Studio 2026 Optimizations -->
+    <LangVersion>preview</LangVersion>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <TrimMode>link</TrimMode>
+    <PublishTrimmed>true</PublishTrimmed>
+    
     <!-- Publish Settings -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
@@ -25,7 +31,6 @@
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     
     <!-- WPF Optimization -->
-    <LangVersion>latest</LangVersion>
     <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
   
