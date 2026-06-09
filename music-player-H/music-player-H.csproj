@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -23,6 +23,10 @@
     <PublishReadyToRun>true</PublishReadyToRun>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    
+    <!-- WPF Optimization -->
+    <LangVersion>latest</LangVersion>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
