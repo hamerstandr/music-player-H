@@ -1,39 +1,30 @@
 ```
-# Build artifacts
+# Compiled and build artifacts
 *.obj
 *.exe
 *.dll
-*.pdb
-*.user
-*.userosscache
-*.suo
-*.cache
-*.ilk
-*.exp
-*.lib
-*.iobj
-*.ipdb
-*.builds
-*.pidb
-*.runtimeconfig.dev.json
+*.so
+*.a
+*.out
 
-# Packages
-*.nupkg
-*.snupkg
+# Dependencies
 packages/
+lib/
 bin/
 obj/
 
-# Logs
+# Logs and temp files
 *.log
+*.tmp
 
-# User-specific files
-.vs/
-.vshost.exe
-.vshost.exe.config
-.vshost.exe.manifest
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
 .vscode/
-
-# Configuration files
+.idea/
 *.userprefs
+*.user
 ```

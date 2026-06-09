@@ -48,14 +48,7 @@ namespace MusicPlayerH.View.Dashboard
         /// </summary>
         private void LoadLanguageSettings()
         {
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            if (addon?.Settings != null && addon.Settings.ContainsKey("Language"))
-            {
-                string lang = addon.Settings["Language"].ToString();
-                _currentLanguageIndex = Array.IndexOf(Languages, lang);
-                if (_currentLanguageIndex < 0) _currentLanguageIndex = 0;
-            }
-            
+            // تنظیمات زبان به صورت محلی مدیریت می‌شود
             ApplyLanguage();
         }
         
@@ -79,14 +72,6 @@ namespace MusicPlayerH.View.Dashboard
                     // عربی
                     FlowDirection = FlowDirection.RightToLeft;
                     break;
-            }
-            
-            // ذخیره تنظیمات
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            if (addon?.Settings != null)
-            {
-                addon.Settings["Language"] = lang;
-                DashboardAddonService.Instance.UpdateAddonSettings("music-player", addon.Settings);
             }
         }
         
