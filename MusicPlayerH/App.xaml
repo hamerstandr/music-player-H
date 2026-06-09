@@ -1,0 +1,22 @@
+<Application x:Class="MusicPlayerH.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:MusicPlayerH.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- منابع و استایل‌های برنامه -->
+        <ResourceDictionary>
+            <!-- رنگ‌های اصلی -->
+            <SolidColorBrush x:Key="PrimaryColor" Color="#1DB954"/>
+            <SolidColorBrush x:Key="SecondaryColor" Color="#191414"/>
+            <SolidColorBrush x:Key="AccentColor" Color="#535353"/>
+            
+            <!-- فونت‌ها -->
+            <FontFamily x:Key="DefaultFont">Segoe UI</FontFamily>
+            
+            <!-- مبدل‌ها -->
+            <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+            <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
