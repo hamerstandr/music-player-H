@@ -2,237 +2,365 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Input;
-using MusicPlayerH.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using LibVLCSharp.Shared;
+using Newtonsoft.Json;
+using MusicPlayerH.Models;
 
-namespace MusicPlayerH.ViewModels
+namespace MusicPlayerH.Services
 {
-    /// <summary>
-    /// مدل نمایشی اصلی برنامه پخش موسیقی
-    /// </summary>
-    public class MainViewModel : BaseViewModel, IDisposable
+    public partial class MainViewModel : ObservableObject
     {
-        private readonly TrafficWatchPluginClient _trafficWatchClient;
-        
-        private string _currentTitle = "عنوان آهنگ";
-        private string _currentArtist = "هنرمند";
-        private string _currentAlbum = "آلبوم";
-        private string _currentDuration = "0:00";
-        private int _currentProgress;
+        private readonly LibVLC _libVLC;
+        private readonly MediaPlayer _mediaPlayer;
+        private Timer? _positionTimer;
+        private Timer? _heartbeatTimer;
+        private bool _isTrafficWatchConnected;
+
+        [ObservableProperty]
+        private ObservableCollection<MediaTrack> _playlist = new();
+
+        [ObservableProperty]
+        private MediaTrack? _currentTrack;
+
+        [ObservableProperty]
         private bool _isPlaying;
-        private string _connectionStatus = "در حال اتصال...";
-        private bool _isConnected;
 
-        public ObservableCollection<MusicTrack> Playlist { get; } = new();
-        
-        private MusicTrack? _selectedTrack;
-        public MusicTrack? SelectedTrack
-        {
-            get => _selectedTrack;
-            set
-            {
-                _selectedTrack = value;
-                OnPropertyChanged();
-                if (value != null)
-                {
-                    LoadTrack(value);
-                }
-            }
-        }
+        [ObservableProperty]
+        private double _position;
 
-        public string CurrentTitle
-        {
-            get => _currentTitle;
-            set { _currentTitle = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private double _duration;
 
-        public string CurrentArtist
-        {
-            get => _currentArtist;
-            set { _currentArtist = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private string _currentTime = "0:00";
 
-        public string CurrentAlbum
-        {
-            get => _currentAlbum;
-            set { _currentAlbum = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private string _totalTime = "0:00";
 
-        public string CurrentDuration
-        {
-            get => _currentDuration;
-            set { _currentDuration = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private string _connectionStatus = "Disconnected";
 
-        public int CurrentProgress
-        {
-            get => _currentProgress;
-            set { _currentProgress = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private bool _isMuted;
 
-        public bool IsPlaying
-        {
-            get => _isPlaying;
-            set { _isPlaying = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private double _volume = 50;
 
-        public string ConnectionStatus
-        {
-            get => _connectionStatus;
-            set { _connectionStatus = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private string _nowPlayingText = "No track selected";
 
-        public bool IsConnected
-        {
-            get => _isConnected;
-            set { _isConnected = value; OnPropertyChanged(); }
-        }
-
-        public ICommand PlayPauseCommand { get; }
-        public ICommand NextCommand { get; }
-        public ICommand PreviousCommand { get; }
-        public ICommand AddToPlaylistCommand { get; }
+        // Expose MediaPlayer for VideoView
+        public MediaPlayer MediaPlayer => _mediaPlayer;
 
         public MainViewModel()
         {
-            _trafficWatchClient = new TrafficWatchPluginClient();
-            
-            // تنظیم رویدادهای اتصال
-            _trafficWatchClient.OnConnected += (s, e) =>
+            // Initialize LibVLC for audio and video support
+            Core.Initialize();
+            _libVLC = new LibVLC(enableDebugLogs: false);
+            _mediaPlayer = new MediaPlayer(_libVLC);
+
+            // Setup media player events
+            _mediaPlayer.Playing += (s, e) => IsPlaying = true;
+            _mediaPlayer.Paused += (s, e) => IsPlaying = false;
+            _mediaPlayer.Stopped += (s, e) => IsPlaying = false;
+            _mediaPlayer.EndReached += (s, e) => PlayNext();
+            _mediaPlayer.LengthChanged += (s, e) =>
             {
-                ConnectionStatus = "✅ متصل به TrafficWatch";
-                IsConnected = true;
+                Duration = e.Length / 1000.0;
+                TotalTime = FormatTime(Duration);
             };
 
-            _trafficWatchClient.OnDisconnected += (s, e) =>
-            {
-                ConnectionStatus = "❌ قطع اتصال از TrafficWatch";
-                IsConnected = false;
-            };
+            // Setup position timer
+            _positionTimer = new Timer(500); // Update every 500ms
+            _positionTimer.Elapsed += OnPositionTimerElapsed;
+            _positionTimer.Start();
 
-            PlayPauseCommand = new RelayCommand(PlayPause);
-            NextCommand = new RelayCommand(NextTrack);
-            PreviousCommand = new RelayCommand(PreviousTrack);
-            AddToPlaylistCommand = new RelayCommand<string>(AddToPlaylist);
+            // Setup heartbeat timer for TrafficWatch
+            _heartbeatTimer = new Timer(30000); // 30 seconds
+            _heartbeatTimer.Elapsed += async (s, e) => await SendHeartbeatAsync();
+            _heartbeatTimer.Start();
 
-            // شروع اتصال به TrafficWatch
-            _ = InitializeTrafficWatchAsync();
+            // Initialize TrafficWatch connection
+            InitializeTrafficWatchAsync();
         }
 
-        private async Task InitializeTrafficWatchAsync()
+        private async void InitializeTrafficWatchAsync()
         {
-            try
+            var client = TrafficWatchPluginClient.Instance;
+            client.ConnectionStateChanged += (connected) =>
             {
-                await _trafficWatchClient.ConnectAsync();
-                
-                if (_trafficWatchClient.IsConnected)
+                IsTrafficWatchConnected = connected;
+                ConnectionStatus = connected ? "Connected to TrafficWatch" : "TrafficWatch not running";
+            };
+
+            await client.InitializeAsync();
+
+            if (IsTrafficWatchConnected && CurrentTrack != null)
+            {
+                await SendNowPlayingAsync();
+            }
+        }
+
+        private void OnPositionTimerElapsed(object? sender, ElapsedEventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (_mediaPlayer.IsPlaying)
                 {
-                    _ = _trafficWatchClient.StartListeningAsync();
-                    
-                    // ارسال داده اولیه
-                    await UpdateTrafficWatchAsync();
+                    Position = _mediaPlayer.Position * 100;
+                    var currentTime = _mediaPlayer.Time / 1000.0;
+                    CurrentTime = FormatTime(currentTime);
+
+                    // Send stream data to TrafficWatch periodically
+                    if (IsTrafficWatchConnected && IsPlaying)
+                    {
+                        SendNowPlayingAsync();
+                    }
+                }
+            });
+        }
+
+        private string FormatTime(double seconds)
+        {
+            if (double.IsNaN(seconds) || seconds < 0) return "0:00";
+            
+            var minutes = (int)(seconds / 60);
+            var secs = (int)(seconds % 60);
+            return $"{minutes}:{secs:D2}";
+        }
+
+        [RelayCommand]
+        private void AddFiles()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Media Files|*.mp3;*.wav;*.flac;*.aac;*.ogg;*.wma;*.mp4;*.avi;*.mkv;*.mov;*.wmv;*.flv;*.webm|All Files|*.*",
+                Multiselect = true,
+                Title = "Select Music or Video Files"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                foreach (var file in dialog.FileNames)
+                {
+                    var track = new MediaTrack
+                    {
+                        FilePath = file,
+                        FileName = Path.GetFileName(file),
+                        Title = Path.GetFileNameWithoutExtension(file),
+                        Artist = "Unknown Artist",
+                        Album = "Unknown Album",
+                        Duration = GetMediaDuration(file)
+                    };
+                    Playlist.Add(track);
+                }
+
+                // Auto-play first track if nothing is playing
+                if (CurrentTrack == null && Playlist.Count > 0)
+                {
+                    PlayTrack(Playlist[0]);
                 }
             }
-            catch (Exception ex)
+        }
+
+        [RelayCommand]
+        private void AddFolder()
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog
             {
-                ConnectionStatus = $"⚠️ خطا: {ex.Message}";
-            }
-        }
-
-        private void LoadTrack(MusicTrack track)
-        {
-            CurrentTitle = track.Title;
-            CurrentArtist = track.Artist;
-            CurrentAlbum = track.Album;
-            CurrentDuration = track.Duration;
-            CurrentProgress = 0;
-            
-            _ = UpdateTrafficWatchAsync();
-        }
-
-        private void PlayPause()
-        {
-            IsPlaying = !IsPlaying;
-            _ = UpdateTrafficWatchAsync();
-        }
-
-        private void NextTrack()
-        {
-            if (Playlist.Count == 0) return;
-            
-            var currentIndex = Playlist.IndexOf(SelectedTrack ?? Playlist[0]);
-            var nextIndex = (currentIndex + 1) % Playlist.Count;
-            SelectedTrack = Playlist[nextIndex];
-        }
-
-        private void PreviousTrack()
-        {
-            if (Playlist.Count == 0) return;
-            
-            var currentIndex = Playlist.IndexOf(SelectedTrack ?? Playlist[0]);
-            var prevIndex = currentIndex > 0 ? currentIndex - 1 : Playlist.Count - 1;
-            SelectedTrack = Playlist[prevIndex];
-        }
-
-        private void AddToPlaylist(string? filePath)
-        {
-            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-                return;
-
-            var track = new MusicTrack
-            {
-                Title = Path.GetFileNameWithoutExtension(filePath),
-                Artist = "نامشخص",
-                Album = "نامشخص",
-                FilePath = filePath,
-                Duration = "0:00"
+                Description = "Select a folder containing media files",
+                UseDescriptionForTitle = true
             };
 
-            Playlist.Add(track);
-            
-            if (SelectedTrack == null)
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                SelectedTrack = track;
+                var files = Directory.GetFiles(dialog.SelectedPath, "*.*")
+                    .Where(f => IsMediaFile(f))
+                    .OrderBy(f => f);
+
+                foreach (var file in files)
+                {
+                    var track = new MediaTrack
+                    {
+                        FilePath = file,
+                        FileName = Path.GetFileName(file),
+                        Title = Path.GetFileNameWithoutExtension(file),
+                        Artist = "Unknown Artist",
+                        Album = "Unknown Album",
+                        Duration = GetMediaDuration(file)
+                    };
+                    Playlist.Add(track);
+                }
+
+                if (CurrentTrack == null && Playlist.Count > 0)
+                {
+                    PlayTrack(Playlist[0]);
+                }
             }
         }
 
-        private async Task UpdateTrafficWatchAsync()
+        private bool IsMediaFile(string path)
         {
-            if (!_trafficWatchClient.IsConnected)
-                return;
+            var extensions = new[] { ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", 
+                                    ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm" };
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            return extensions.Contains(ext);
+        }
 
+        private string GetMediaDuration(string filePath)
+        {
             try
             {
-                await _trafficWatchClient.SendStreamDataAsync(
-                    CurrentTitle,
-                    CurrentArtist,
-                    CurrentAlbum,
-                    CurrentDuration,
-                    CurrentProgress,
-                    IsPlaying
-                );
+                using var media = new Media(_libVLC, filePath);
+                // This is a simplified version - in production you'd parse metadata properly
+                return "Unknown";
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"[MusicPlayerH] خطا در ارسال به TrafficWatch: {ex.Message}");
+                return "Unknown";
             }
+        }
+
+        [RelayCommand]
+        private void PlayTrack(MediaTrack? track)
+        {
+            if (track == null) return;
+
+            CurrentTrack = track;
+            NowPlayingText = $"{track.Title} - {track.Artist}";
+
+            var media = new Media(_libVLC, track.FilePath);
+            _mediaPlayer.Media = media;
+            _mediaPlayer.Play();
+
+            // Send to TrafficWatch
+            if (IsTrafficWatchConnected)
+            {
+                SendNowPlayingAsync();
+            }
+        }
+
+        [RelayCommand]
+        private void PlayPause()
+        {
+            if (_mediaPlayer.IsPlaying)
+                _mediaPlayer.Pause();
+            else if (CurrentTrack != null)
+                _mediaPlayer.Play();
+            else if (Playlist.Count > 0)
+                PlayTrack(Playlist[0]);
+        }
+
+        [RelayCommand]
+        private void Stop()
+        {
+            _mediaPlayer.Stop();
+            IsPlaying = false;
+            Position = 0;
+            CurrentTime = "0:00";
+        }
+
+        [RelayCommand]
+        private void PlayNext()
+        {
+            if (CurrentTrack == null || Playlist.Count == 0) return;
+
+            var currentIndex = Playlist.IndexOf(CurrentTrack);
+            var nextIndex = (currentIndex + 1) % Playlist.Count;
+            PlayTrack(Playlist[nextIndex]);
+        }
+
+        [RelayCommand]
+        private void PlayPrevious()
+        {
+            if (CurrentTrack == null || Playlist.Count == 0) return;
+
+            var currentIndex = Playlist.IndexOf(CurrentTrack);
+            var prevIndex = currentIndex > 0 ? currentIndex - 1 : Playlist.Count - 1;
+            PlayTrack(Playlist[prevIndex]);
+        }
+
+        [RelayCommand]
+        private void RemoveSelectedTrack(MediaTrack? track)
+        {
+            if (track == null) return;
+
+            var wasPlaying = CurrentTrack == track;
+            Playlist.Remove(track);
+
+            if (wasPlaying)
+            {
+                Stop();
+                CurrentTrack = null;
+                NowPlayingText = "No track selected";
+            }
+        }
+
+        [RelayCommand]
+        private void ClearPlaylist()
+        {
+            Stop();
+            Playlist.Clear();
+            CurrentTrack = null;
+            NowPlayingText = "No track selected";
+        }
+
+        partial void OnVolumeChanged(double value)
+        {
+            _mediaPlayer.Volume = (int)value;
+        }
+
+        partial void OnPositionChanged(double value)
+        {
+            if (!_mediaPlayer.IsPlaying) return;
+            _mediaPlayer.Position = (float)(value / 100.0);
+        }
+
+        private async Task SendNowPlayingAsync()
+        {
+            if (CurrentTrack == null || !IsTrafficWatchConnected) return;
+
+            var payload = new
+            {
+                type = "now_playing",
+                title = CurrentTrack.Title,
+                artist = CurrentTrack.Artist,
+                album = CurrentTrack.Album,
+                duration = CurrentTrack.Duration,
+                progress = (int)Position,
+                isPlaying = IsPlaying
+            };
+
+            var message = new
+            {
+                action = "stream_data",
+                timestamp = DateTime.UtcNow.ToString("o"),
+                payload
+            };
+
+            await TrafficWatchPluginClient.Instance.SendDataAsync(JsonConvert.SerializeObject(message));
+        }
+
+        private async Task SendHeartbeatAsync()
+        {
+            if (!IsTrafficWatchConnected) return;
+
+            var message = new { action = "heartbeat" };
+            await TrafficWatchPluginClient.Instance.SendDataAsync(JsonConvert.SerializeObject(message));
         }
 
         public void Dispose()
         {
-            _trafficWatchClient.Dispose();
+            _positionTimer?.Stop();
+            _positionTimer?.Dispose();
+            _heartbeatTimer?.Stop();
+            _heartbeatTimer?.Dispose();
+            _mediaPlayer.Dispose();
+            _libVLC.Dispose();
         }
-    }
-
-    /// <summary>
-    /// مدل یک ترک موسیقی
-    /// </summary>
-    public class MusicTrack
-    {
-        public string Title { get; set; } = "";
-        public string Artist { get; set; } = "";
-        public string Album { get; set; } = "";
-        public string Duration { get; set; } = "";
-        public string FilePath { get; set; } = "";
     }
 }

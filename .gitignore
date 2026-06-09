@@ -1,41 +1,43 @@
 ```
 # Build artifacts
-bin/
 obj/
+bin/
 *.exe
 *.dll
 *.pdb
 *.userprefs
 *.cache
-*.log
+*.compiled
+*.nupkg
+*.snupkg
 
 # Dependencies
 packages/
+node_modules/
+vendor/
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Logs
+*.log
+**/logs/
 
-# Visual Studio files
+# User-specific files
 .vs/
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-
-# Environment
+# Environment specific
 .env
 .env.local
-*.env.*
+*.local
 
-# Logs
-*.log
-
-# User-specific files
-.vscode/settings.json
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+._*
+.Spotlight-V100
+.Trashes
 ```

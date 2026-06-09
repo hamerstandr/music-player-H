@@ -1,65 +1,75 @@
 using System;
 using System.IO.Pipes;
 using System.Text;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MusicPlayerH.Services
 {
-    /// <summary>
-    /// سرویس ارتباط با TrafficWatch از طریق Named Pipe
-    /// </summary>
     public class TrafficWatchPluginClient : IDisposable
     {
-        private const string PipeName = "TrafficWatchPluginPipe";
+        private static TrafficWatchPluginClient? _instance;
         private NamedPipeClientStream? _pipeClient;
-        private CancellationTokenSource? _heartbeatCts;
-        private Task? _heartbeatTask;
         private bool _isConnected;
-        private string? _pluginId;
-        private readonly object _lock = new();
+        private readonly string _pipeName = "TrafficWatchPluginPipe";
+        private readonly string _pluginId = Guid.NewGuid().ToString("N")[..8];
+
+        public static TrafficWatchPluginClient Instance => _instance ??= new TrafficWatchPluginClient();
+
+        public event Action<bool>? ConnectionStateChanged;
 
         public bool IsConnected => _isConnected;
-        public string? PluginId => _pluginId;
 
-        public event EventHandler<string>? OnMessageReceived;
-        public event EventHandler? OnConnected;
-        public event EventHandler? OnDisconnected;
+        private TrafficWatchPluginClient() { }
 
-        public async Task ConnectAsync()
+        public async Task InitializeAsync()
+        {
+            try
+            {
+                await ConnectAsync();
+                if (_isConnected)
+                {
+                    await RegisterAsync();
+                }
+            }
+            catch
+            {
+                // TrafficWatch is not running, continue normally
+                _isConnected = false;
+                ConnectionStateChanged?.Invoke(false);
+            }
+        }
+
+        private async Task ConnectAsync()
         {
             try
             {
                 _pipeClient = new NamedPipeClientStream(
                     ".", 
-                    PipeName, 
-                    PipeDirection.InOut, 
+                    _pipeName, 
+                    PipeDirection.Out, 
                     PipeOptions.Asynchronous);
 
-                await _pipeClient.ConnectAsync(5000);
-                
+                await _pipeClient.ConnectAsync(2000); // 2 second timeout
+
                 if (_pipeClient.IsConnected)
                 {
                     _isConnected = true;
-                    OnConnected?.Invoke(this, EventArgs.Empty);
-                    
-                    // شروع Heartbeat
-                    StartHeartbeat();
-                    
-                    // ثبت نام خودکار
-                    await RegisterAsync();
+                    ConnectionStateChanged?.Invoke(true);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"[TrafficWatch] خطا در اتصال: {ex.Message}");
                 _isConnected = false;
+                _pipeClient?.Dispose();
+                _pipeClient = null;
+                throw;
             }
         }
 
         private async Task RegisterAsync()
         {
+            if (!_isConnected || _pipeClient == null) return;
+
             var registerMessage = new
             {
                 action = "register",
@@ -71,156 +81,57 @@ namespace MusicPlayerH.Services
             await SendMessageAsync(registerMessage);
         }
 
-        private void StartHeartbeat()
+        public async Task SendDataAsync(string jsonData)
         {
-            _heartbeatCts = new CancellationTokenSource();
-            _heartbeatTask = Task.Run(async () =>
+            if (!_isConnected || _pipeClient == null) return;
+
+            try
             {
-                while (!_heartbeatCts.Token.IsCancellationRequested && _isConnected)
-                {
-                    try
-                    {
-                        await Task.Delay(30000, _heartbeatCts.Token);
-                        
-                        if (_isConnected)
-                        {
-                            var heartbeatMessage = new { action = "heartbeat" };
-                            await SendMessageAsync(heartbeatMessage);
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"[TrafficWatch] خطا در ارسال Heartbeat: {ex.Message}");
-                    }
-                }
-            });
-        }
-
-        public async Task SendStreamDataAsync(string title, string artist, string album, 
-            string duration, int progress, bool isPlaying)
-        {
-            if (!_isConnected || _pipeClient == null)
-                return;
-
-            var streamData = new
+                var bytes = Encoding.UTF8.GetBytes(jsonData + "\n");
+                await _pipeClient.WriteAsync(bytes, 0, bytes.Length);
+                await _pipeClient.FlushAsync();
+            }
+            catch
             {
-                action = "stream_data",
-                timestamp = DateTime.UtcNow.ToString("o"),
-                payload = new
-                {
-                    type = "now_playing",
-                    title,
-                    artist,
-                    album,
-                    duration,
-                    progress,
-                    isPlaying
-                }
-            };
-
-            await SendMessageAsync(streamData);
+                // Connection lost, try to reconnect
+                _isConnected = false;
+                ConnectionStateChanged?.Invoke(false);
+                _ = ReconnectAsync();
+            }
         }
 
         private async Task SendMessageAsync(object message)
         {
-            if (_pipeClient == null || !_pipeClient.IsConnected)
-                return;
-
-            lock (_lock)
-            {
-                try
-                {
-                    var json = JsonSerializer.Serialize(message);
-                    var bytes = Encoding.UTF8.GetBytes(json + "\n");
-                    _pipeClient.Write(bytes, 0, bytes.Length);
-                    await _pipeClient.FlushAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[TrafficWatch] خطا در ارسال پیام: {ex.Message}");
-                    HandleDisconnection();
-                }
-            }
+            var json = System.Text.Json.JsonSerializer.Serialize(message);
+            await SendDataAsync(json);
         }
 
-        public async Task StartListeningAsync()
+        private async Task ReconnectAsync()
         {
-            if (_pipeClient == null)
-                return;
-
-            var buffer = new byte[4096];
-            
             try
             {
-                while (_isConnected && _pipeClient.IsConnected)
+                _pipeClient?.Dispose();
+                _pipeClient = null;
+                
+                await Task.Delay(5000); // Wait 5 seconds before retry
+                await ConnectAsync();
+                
+                if (_isConnected)
                 {
-                    var bytesRead = await _pipeClient.ReadAsync(buffer, 0, buffer.Length);
-                    
-                    if (bytesRead > 0)
-                    {
-                        var message = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
-                        
-                        if (!string.IsNullOrEmpty(message))
-                        {
-                            try
-                            {
-                                using var doc = JsonDocument.Parse(message);
-                                
-                                if (doc.RootElement.TryGetProperty("action", out var actionElement))
-                                {
-                                    var action = actionElement.GetString();
-                                    
-                                    if (action == "registered" && 
-                                        doc.RootElement.TryGetProperty("id", out var idElement))
-                                    {
-                                        _pluginId = idElement.GetString();
-                                        Console.WriteLine($"[TrafficWatch] افزونه ثبت شد. شناسه: {_pluginId}");
-                                    }
-                                }
-                                
-                                OnMessageReceived?.Invoke(this, message);
-                            }
-                            catch (JsonException)
-                            {
-                                // نادیده گرفتن پیام‌های نامعتبر
-                            }
-                        }
-                    }
+                    await RegisterAsync();
                 }
             }
-            catch (IOException)
+            catch
             {
-                HandleDisconnection();
+                // Still can't connect, will retry later
             }
-        }
-
-        private void HandleDisconnection()
-        {
-            if (_isConnected)
-            {
-                _isConnected = false;
-                _pluginId = null;
-                OnDisconnected?.Invoke(this, EventArgs.Empty);
-                Console.WriteLine("[TrafficWatch] اتصال قطع شد.");
-            }
-        }
-
-        public void Disconnect()
-        {
-            _heartbeatCts?.Cancel();
-            _pipeClient?.Dispose();
-            _isConnected = false;
-            _pluginId = null;
         }
 
         public void Dispose()
         {
-            Disconnect();
-            _heartbeatCts?.Dispose();
+            _isConnected = false;
+            _pipeClient?.Dispose();
+            _pipeClient = null;
         }
     }
 }

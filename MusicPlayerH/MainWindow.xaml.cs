@@ -1,28 +1,35 @@
 using System.Windows;
+using LibVLCSharp.WPF;
+using MusicPlayerH.Services;
 
 namespace MusicPlayerH
 {
-    /// <summary>
-    /// پنجره اصلی برنامه پخش موسیقی
-    /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly MainViewModel _viewModel;
+        private VideoView? _videoView;
+
         public MainWindow()
         {
             InitializeComponent();
-            
-            // تنظیم DataContext
-            var viewModel = new ViewModels.MainViewModel();
-            DataContext = viewModel;
-            
-            // ثبت رویداد بسته شدن برای پاک‌سازی منابع
-            Closed += (s, e) =>
+
+            _viewModel = new MainViewModel();
+            DataContext = _viewModel;
+
+            // Initialize VideoView for video playback
+            InitializeVideoView();
+
+            Closed += (s, e) => _viewModel.Dispose();
+        }
+
+        private void InitializeVideoView()
+        {
+            _videoView = new VideoView
             {
-                if (viewModel is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
+                MediaPlayer = _viewModel.MediaPlayer
             };
+            
+            VideoView.Content = _videoView;
         }
     }
 }
