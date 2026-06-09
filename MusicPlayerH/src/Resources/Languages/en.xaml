@@ -9,7 +9,7 @@
     
     <!-- Header -->
     <sys:String x:Key="HeaderTitle">🎵 Music Player H</sys:String>
-    <sys:String x:Key="HeaderSubtitle">| Professional Music & Video Player</sys:String>
+    <sys:String x:Key="HeaderSubtitle">| Professional Music &amp; Video Player</sys:String>
     
     <!-- Now Playing Section -->
     <sys:String x:Key="NowPlayingTitle">Now Playing</sys:String>
