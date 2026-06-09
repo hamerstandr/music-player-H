@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+    <!-- فارسی - زبان پیش‌فرض -->
+    
+    <!-- عنوان پنجره -->
+    <sys:String x:Key="WindowTitle">Music Player H - پخش‌کننده حرفه‌ای موسیقی و ویدیو</sys:String>
+    
+    <!-- هدر -->
+    <sys:String x:Key="HeaderTitle">🎵 Music Player H</sys:String>
+    <sys:String x:Key="HeaderSubtitle">| پخش‌کننده حرفه‌ای موسیقی و ویدیو</sys:String>
+    
+    <!-- بخش Now Playing -->
+    <sys:String x:Key="NowPlayingTitle">در حال پخش</sys:String>
+    <sys:String x:Key="NoMediaText">هیچ رسانه‌ای</sys:String>
+    <sys:String x:Key="UnknownAlbum">آلبوم ناشناخته</sys:String>
+    <sys:String x:Key="NoTrackSelected">هیچ آهنگی انتخاب نشده است</sys:String>
+    
+    <!-- لیست پخش -->
+    <sys:String x:Key="PlaylistTitle">لیست پخش</sys:String>
+    <sys:String x:Key="AddFilesButton">➕ افزودن فایل‌ها</sys:String>
+    <sys:String x:Key="AddFolderButton">📁 افزودن پوشه</sys:String>
+    <sys:String x:Key="ClearAllButton">🗑️ پاک کردن همه</sys:String>
+    
+    <!-- کنترل‌های پخش -->
+    <sys:String x:Key="PlayButton">▶️</sys:String>
+    <sys:String x:Key="PauseButton">⏸️</sys:String>
+    <sys:String x:Key="StopButton">⏹️</sys:String>
+    <sys:String x:Key="NextButton">⏭️</sys:String>
+    <sys:String x:Key="PreviousButton">⏮️</sys:String>
+    <sys:String x:Key="MuteButton">🔊</sys:String>
+    
+    <!-- وضعیت اتصال -->
+    <sys:String x:Key="ConnectedStatus">متصل به TrafficWatch</sys:String>
+    <sys:String x:Key="DisconnectedStatus">TrafficWatch در حال اجرا نیست</sys:String>
+    
+    <!-- منوی زبان -->
+    <sys:String x:Key="LanguageMenu">🌐 زبان</sys:String>
+    <sys:String x:Key="LanguageFA">فارسی</sys:String>
+    <sys:String x:Key="LanguageAR">العربیة</sys:String>
+    <sys:String x:Key="LanguageEN">English</sys:String>
+    
+    <!-- سایر -->
+    <sys:String x:Key="UnknownArtist">هنرمند ناشناخته</sys:String>
+    <sys:String x:Key="SelectFilesTitle">انتخاب فایل‌های موسیقی یا ویدیو</sys:String>
+    <sys:String x:Key="SelectFolderTitle">انتخاب پوشه حاوی فایل‌های رسانه‌ای</sys:String>
+    
+</ResourceDictionary>

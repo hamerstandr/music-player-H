@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Music Player H - Professional Music & Video Player" 
+        Title="{DynamicResource WindowTitle}" 
         Height="750" Width="1200"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundBrush}">
@@ -25,11 +25,11 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="🎵 Music Player H" 
+                    <TextBlock Text="{DynamicResource HeaderTitle}" 
                                FontSize="28" 
                                FontWeight="Bold" 
                                Foreground="{StaticResource PrimaryBrush}"/>
-                    <TextBlock Text=" | Professional Music & Video Player" 
+                    <TextBlock Text="{DynamicResource HeaderSubtitle}" 
                                FontSize="14" 
                                Foreground="{StaticResource TextSecondaryBrush}"
                                VerticalAlignment="Center"
@@ -44,6 +44,47 @@
                                FontSize="12" 
                                Foreground="{StaticResource TextSecondaryBrush}"
                                VerticalAlignment="Center"/>
+                    
+                    <!-- Language Selector -->
+                    <Border Margin="20,0,0,0" Background="{StaticResource SurfaceHoverBrush}" CornerRadius="5" Padding="10,5">
+                        <Grid>
+                            <ToggleButton Content="🌐 {Binding CurrentLanguageDisplay}" 
+                                          Style="{StaticResource ModernButton}"
+                                          IsChecked="{Binding IsLanguageMenuOpen, Mode=TwoWay}"
+                                          Command="{Binding ToggleLanguageMenuCommand}"
+                                          FontSize="12"
+                                          Padding="15,8"/>
+                            
+                            <Popup IsOpen="{Binding IsLanguageMenuOpen}" 
+                                   Placement="Bottom" 
+                                   PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                                   StaysOpen="False"
+                                   AllowsTransparency="True">
+                                <Border Background="{StaticResource SurfaceBrush}" 
+                                        CornerRadius="5" 
+                                        BorderBrush="{StaticResource PrimaryBrush}"
+                                        BorderThickness="1"
+                                        Padding="10">
+                                    <StackPanel>
+                                        <Button Content="فارسی" 
+                                                Style="{StaticResource ModernButton}"
+                                                Command="{Binding SetLanguageFACommand}"
+                                                Margin="0,0,0,5"
+                                                HorizontalAlignment="Stretch"/>
+                                        <Button Content="العربية" 
+                                                Style="{StaticResource ModernButton}"
+                                                Command="{Binding SetLanguageARCommand}"
+                                                Margin="0,0,0,5"
+                                                HorizontalAlignment="Stretch"/>
+                                        <Button Content="English" 
+                                                Style="{StaticResource ModernButton}"
+                                                Command="{Binding SetLanguageENCommand}"
+                                                HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </Border>
                 </StackPanel>
             </Grid>
         </Border>
@@ -68,7 +109,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Now Playing" 
+                    <TextBlock Text="{DynamicResource NowPlayingTitle}" 
                                FontSize="20" 
                                FontWeight="SemiBold" 
                                Foreground="{StaticResource TextBrush}"
@@ -91,7 +132,7 @@
                                         VerticalAlignment="Center"
                                         Visibility="Collapsed">
                                 <TextBlock Text="🎵" FontSize="80" HorizontalAlignment="Center"/>
-                                <TextBlock Text="No Media" 
+                                <TextBlock Text="{DynamicResource NoMediaText}" 
                                            FontSize="18" 
                                            Foreground="{StaticResource TextSecondaryBrush}"
                                            HorizontalAlignment="Center"
@@ -108,7 +149,7 @@
                                    Foreground="{StaticResource TextBrush}"
                                    TextWrapping="Wrap"
                                    TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{Binding CurrentTrack.Album, FallbackValue='Unknown Album'}" 
+                        <TextBlock Text="{Binding CurrentTrack.Album, FallbackValue={DynamicResource UnknownAlbum}}" 
                                    FontSize="16" 
                                    Foreground="{StaticResource TextSecondaryBrush}"
                                    Margin="0,5,0,0"/>
@@ -129,22 +170,22 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Playlist" 
+                    <TextBlock Text="{DynamicResource PlaylistTitle}" 
                                FontSize="20" 
                                FontWeight="SemiBold" 
                                Foreground="{StaticResource TextBrush}"/>
 
                     <!-- Toolbar -->
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,15,0,15">
-                        <Button Content="➕ Add Files" 
+                        <Button Content="{DynamicResource AddFilesButton}" 
                                 Style="{StaticResource ModernButton}"
                                 Command="{Binding AddFilesCommand}"
                                 Margin="0,0,10,0"/>
-                        <Button Content="📁 Add Folder" 
+                        <Button Content="{DynamicResource AddFolderButton}" 
                                 Style="{StaticResource ModernButton}"
                                 Command="{Binding AddFolderCommand}"
                                 Margin="0,0,10,0"/>
-                        <Button Content="🗑️ Clear All" 
+                        <Button Content="{DynamicResource ClearAllButton}" 
                                 Style="{StaticResource ModernButton}"
                                 Background="#FF5252"
                                 Command="{Binding ClearPlaylistCommand}"/>

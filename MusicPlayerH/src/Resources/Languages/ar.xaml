@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+    <!-- العربية -->
+    
+    <!-- عنوان النافذة -->
+    <sys:String x:Key="WindowTitle">Music Player H - مشغل موسيقى وفيديو احترافي</sys:String>
+    
+    <!-- الرأس -->
+    <sys:String x:Key="HeaderTitle">🎵 Music Player H</sys:String>
+    <sys:String x:Key="HeaderSubtitle">| مشغل موسيقى وفيديو احترافي</sys:String>
+    
+    <!-- قسم التشغيل الآن -->
+    <sys:String x:Key="NowPlayingTitle">جاري التشغيل</sys:String>
+    <sys:String x:Key="NoMediaText">لا يوجد وسائط</sys:String>
+    <sys:String x:Key="UnknownAlbum">ألبوم غير معروف</sys:String>
+    <sys:String x:Key="NoTrackSelected">لم يتم اختيار أي أغنية</sys:String>
+    
+    <!-- قائمة التشغيل -->
+    <sys:String x:Key="PlaylistTitle">قائمة التشغيل</sys:String>
+    <sys:String x:Key="AddFilesButton">➕ إضافة ملفات</sys:String>
+    <sys:String x:Key="AddFolderButton">📁 إضافة مجلد</sys:String>
+    <sys:String x:Key="ClearAllButton">🗑️ مسح الكل</sys:String>
+    
+    <!-- أزرار التحكم -->
+    <sys:String x:Key="PlayButton">▶️</sys:String>
+    <sys:String x:Key="PauseButton">⏸️</sys:String>
+    <sys:String x:Key="StopButton">⏹️</sys:String>
+    <sys:String x:Key="NextButton">⏭️</sys:String>
+    <sys:String x:Key="PreviousButton">⏮️</sys:String>
+    <sys:String x:Key="MuteButton">🔊</sys:String>
+    
+    <!-- حالة الاتصال -->
+    <sys:String x:Key="ConnectedStatus">متصل بـ TrafficWatch</sys:String>
+    <sys:String x:Key="DisconnectedStatus">TrafficWatch غير قيد التشغيل</sys:String>
+    
+    <!-- قائمة اللغة -->
+    <sys:String x:Key="LanguageMenu">🌐 اللغة</sys:String>
+    <sys:String x:Key="LanguageFA">فارسی</sys:String>
+    <sys:String x:Key="LanguageAR">العربیة</sys:String>
+    <sys:String x:Key="LanguageEN">English</sys:String>
+    
+    <!-- أخرى -->
+    <sys:String x:Key="UnknownArtist">فنان غير معروف</sys:String>
+    <sys:String x:Key="SelectFilesTitle">حدد ملفات الموسيقى أو الفيديو</sys:String>
+    <sys:String x:Key="SelectFolderTitle">حدد مجلداً يحتوي على ملفات الوسائط</sys:String>
+    
+</ResourceDictionary>

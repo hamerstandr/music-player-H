@@ -5,6 +5,11 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <!-- Merge Language Resources (Default: Persian) -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="src/Resources/Languages/fa.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
             <!-- Converters -->
             <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
             <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
