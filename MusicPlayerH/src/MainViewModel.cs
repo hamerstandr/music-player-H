@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using LibVLCSharp.Shared;
 using Newtonsoft.Json;
 using MediaTrack = MusicPlayerH.Models.MediaTrack;
+using System.Timers;
 
 namespace MusicPlayerH.Services
 {
