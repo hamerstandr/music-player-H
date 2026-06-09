@@ -14,7 +14,6 @@ namespace MusicPlayerH.Services.Dashboard
     /// </summary>
     public class MusicPlayerService
     {
-        private readonly string _apiEndpoint;
         private System.Timers.Timer _refreshTimer;
         private bool _isInitialized;
         
@@ -28,6 +27,9 @@ namespace MusicPlayerH.Services.Dashboard
         // لیست پخش
         private ObservableCollection<MediaTrackInfo> _playlist;
         private int _currentIndex;
+        
+        // تنظیمات محلی
+        private Dictionary<string, object> _settings;
         
         /// <summary>
         /// رویداد تغییر وضعیت پخش
@@ -46,9 +48,7 @@ namespace MusicPlayerH.Services.Dashboard
         
         public MusicPlayerService()
         {
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            _apiEndpoint = DashboardAddonService.Instance.GetAddonApiEndpoint("music-player");
-            
+            _settings = new Dictionary<string, object>();
             _playlist = new ObservableCollection<MediaTrackInfo>();
             _currentIndex = -1;
             _volume = 75;
@@ -64,10 +64,6 @@ namespace MusicPlayerH.Services.Dashboard
         {
             if (_isInitialized) return;
             
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            if (addon == null || !addon.IsInstalled || !addon.IsEnabled)
-                return;
-            
             // بارگذاری تنظیمات
             LoadSettings();
             
@@ -80,16 +76,15 @@ namespace MusicPlayerH.Services.Dashboard
         }
         
         /// <summary>
-        /// بارگذاری تنظیمات از افزونه
+        /// بارگذاری تنظیمات از ذخیره محلی
         /// </summary>
         private void LoadSettings()
         {
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            if (addon?.Settings != null)
+            if (_settings != null)
             {
-                _volume = Convert.ToInt32(addon.Settings.ContainsKey("Volume") ? addon.Settings["Volume"] : 75);
-                _shuffle = Convert.ToBoolean(addon.Settings.ContainsKey("Shuffle") ? addon.Settings["Shuffle"] : false);
-                _repeatMode = addon.Settings.ContainsKey("Repeat") ? addon.Settings["Repeat"].ToString() : "none";
+                _volume = Convert.ToInt32(_settings.ContainsKey("Volume") ? _settings["Volume"] : 75);
+                _shuffle = Convert.ToBoolean(_settings.ContainsKey("Shuffle") ? _settings["Shuffle"] : false);
+                _repeatMode = _settings.ContainsKey("Repeat") ? _settings["Repeat"].ToString() : "none";
             }
         }
         
@@ -437,13 +432,8 @@ namespace MusicPlayerH.Services.Dashboard
         {
             _volume = Math.Max(0, Math.Min(100, volume));
             
-            // بروزرسانی تنظیمات
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            if (addon?.Settings != null)
-            {
-                addon.Settings["Volume"] = _volume;
-                DashboardAddonService.Instance.UpdateAddonSettings("music-player", addon.Settings);
-            }
+            // بروزرسانی تنظیمات محلی
+            _settings["Volume"] = _volume;
         }
         
         /// <summary>
@@ -453,12 +443,8 @@ namespace MusicPlayerH.Services.Dashboard
         {
             _shuffle = !_shuffle;
             
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            if (addon?.Settings != null)
-            {
-                addon.Settings["Shuffle"] = _shuffle;
-                DashboardAddonService.Instance.UpdateAddonSettings("music-player", addon.Settings);
-            }
+            // بروزرسانی تنظیمات محلی
+            _settings["Shuffle"] = _shuffle;
         }
         
         /// <summary>
@@ -474,12 +460,8 @@ namespace MusicPlayerH.Services.Dashboard
                 _ => "none"
             };
             
-            var addon = DashboardAddonService.Instance.GetAddonById("music-player");
-            if (addon?.Settings != null)
-            {
-                addon.Settings["Repeat"] = _repeatMode;
-                DashboardAddonService.Instance.UpdateAddonSettings("music-player", addon.Settings);
-            }
+            // بروزرسانی تنظیمات محلی
+            _settings["Repeat"] = _repeatMode;
         }
         
         /// <summary>
