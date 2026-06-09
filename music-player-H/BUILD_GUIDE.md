@@ -5,10 +5,11 @@
 ## فهرست مطالب
 
 1. [پیش‌نیازها](#پیش‌نیازها)
-2. [بیلد در Visual Studio](#بیلد-در-visual-studio)
+2. [بیلد در Visual Studio 2026](#بیلد-در-visual-studio-2026)
 3. [بیلد با خط فرمان](#بیلد-با-خط-فرمان)
 4. [پابلیش برای انتشار](#پابلیش-برای-انتشار)
-5. [عیب‌یابی](#عیب‌یابی)
+5. [تنظیمات Advanced .NET 10](#تنظیمات-advanced-net-10)
+6. [عیب‌یابی](#عیب‌یابی)
 
 ---
 
@@ -16,15 +17,16 @@
 
 ### نرم‌افزارهای مورد نیاز
 
-1. **Visual Studio 2022** (Community, Professional یا Enterprise)
+1. **Visual Studio 2026** (Community, Professional یا Enterprise)
    - دانلود از: https://visualstudio.microsoft.com/
+   - **نکته:** حداقل نسخه 17.12 یا بالاتر required است
    
 2. **Workloadهای لازم**:
    - ✅ .NET Desktop Development
    
-3. **.NET 6.0 SDK**
-   - معمولاً با Visual Studio نصب می‌شود
-   - دانلود جداگانه: https://dotnet.microsoft.com/download/dotnet/6.0
+3. **.NET 10 SDK**
+   - معمولاً با Visual Studio 2026 نصب می‌شود
+   - دانلود جداگانه: https://dotnet.microsoft.com/download/dotnet/10.0
 
 ### بررسی نصب بودن
 
@@ -32,16 +34,16 @@
 # بررسی نسخه dotnet
 dotnet --version
 
-# باید خروجی مشابه دهد: 6.0.x
+# باید خروجی مشابه دهد: 10.0.x
 ```
 
 ---
 
-## بیلد در Visual Studio
+## بیلد در Visual Studio 2026
 
 ### مرحله 1: باز کردن پروژه
 
-1. Visual Studio 2022 را باز کنید
+1. Visual Studio 2026 را باز کنید
 2. از منوی File > Open > Project/Solution
 3. فایل `music-player-H.csproj` را انتخاب کنید
 
@@ -98,18 +100,20 @@ dotnet build -c Release -v detailed
 
 ### پابلیش Framework-Dependent (توصیه شده)
 
-این نوع پابلیش کوچکترین حجم را دارد اما نیاز به نصب .NET 6 روی سیستم کاربر دارد:
+این نوع پابلیش کوچکترین حجم را دارد اما نیاز به نصب .NET 10 روی سیستم کاربر دارد:
 
 ```bash
 dotnet publish -c Release -r win-x64 \
   -p:PublishSingleFile=true \
   -p:SelfContained=false \
+  -p:PublishTrimmed=true \
+  -p:EnableCompressionInSingleFile=true \
   -o ./publish
 ```
 
 **خروجی:**
-- حجم: ~10-15 MB
-- نیاز به .NET 6: ✅ دارد
+- حجم: ~8-12 MB (با فشرده‌سازی)
+- نیاز به .NET 10: ✅ دارد
 - فایل خروجی: `publish/music-player-H.exe`
 
 ### پابلیش Self-Contained
@@ -121,58 +125,74 @@ dotnet publish -c Release -r win-x64 \
   -p:PublishSingleFile=true \
   -p:SelfContained=true \
   -p:PublishTrimmed=true \
+  -p:EnableCompressionInSingleFile=true \
   -o ./publish-standalone
 ```
 
 **خروجی:**
-- حجم: ~60-80 MB
-- نیاز به .NET 6: ❌ ندارد
+- حجم: ~50-70 MB (با Trim و فشرده‌سازی)
+- نیاز به .NET 10: ❌ ندارد
 - فایل خروجی: `publish-standalone/music-player-H.exe`
 
-### پابلیش با فشرده‌سازی
+### پابلیش با فشرده‌سازی پیشرفته
 
-برای کاهش حجم فایل نهایی:
+برای کاهش حداکثری حجم فایل نهایی:
 
 ```bash
 dotnet publish -c Release -r win-x64 \
   -p:PublishSingleFile=true \
   -p:SelfContained=false \
+  -p:PublishTrimmed=true \
+  -p:TrimMode=link \
   -p:EnableCompressionInSingleFile=true \
-  -o ./publish-compressed
+  -p:ReadyToRun=true \
+  -o ./publish-optimized
 ```
 
 ---
 
-## تنظیمات Advanced
+## تنظیمات Advanced .NET 10
 
-### ایجاد Installer (MSI)
+### ویژگی‌های جدید .NET 10
 
-برای ساخت فایل نصبی:
-
-1. نصب Extension: **WiX Toolset Visual Studio Extension**
-2. افزودن پروژه Setup به Solution
-3. تنظیمات را مطابق زیر انجام دهید:
+پروژه از ویژگی‌های پیشرفته .NET 10 بهره می‌برد:
 
 ```xml
-<!-- در فایل .wxs -->
-<Product Id="*" Name="Music Player H" Language="1033" Version="2.0.0" Manufacturer="Music Player H Team" UpgradeCode="*">
-  <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
-  
-  <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-  
-  <Feature Id="ProductFeature" Title="Music Player H" Level="1">
-    <ComponentGroupRef Id="ProductComponents" />
-    <ComponentRef Id="ApplicationComponent" />
-  </Feature>
-</Product>
+<!-- در فایل .csproj -->
+<LangVersion>preview</LangVersion>
+<EnableWindowsTargeting>true</EnableWindowsTargeting>
+<TrimMode>link</TrimMode>
+<PublishTrimmed>true</PublishTrimmed>
 ```
 
-### امضای دیجیتال
+### بهینه‌سازی‌های WPF در .NET 10
 
-برای امضای فایل اجرایی:
+- ✅ بهبود Performance در رندرینگ UI
+- ✅ کاهش مصرف حافظه
+- ✅ پشتیبانی از HiDPI و 4K
+- ✅ بهبود انیمیشن‌ها و ترنزیشن‌ها
+
+### Trim Settings
+
+برای حذف کدهای استفاده نشده و کاهش حجم:
 
 ```bash
-signtool sign /f certificate.pfx /p password /t http://timestamp.digicert.com publish/music-player-H.exe
+dotnet publish -c Release -r win-x64 \
+  -p:PublishTrimmed=true \
+  -p:TrimMode=link \
+  -p:TrimmerDefaultAction=link \
+  -o ./publish-trimmed
+```
+
+### ReadyToRun Compilation
+
+برای بهبود سرعت اجرا:
+
+```bash
+dotnet publish -c Release -r win-x64 \
+  -p:PublishReadyToRun=true \
+  -p:ReadyToRunComposite=true \
+  -o ./publish-r2r
 ```
 
 ---
@@ -188,10 +208,11 @@ signtool sign /f certificate.pfx /p password /t http://timestamp.digicert.com pu
 param(
     [string]$Configuration = "Release",
     [string]$Runtime = "win-x64",
-    [switch]$SelfContained
+    [switch]$SelfContained,
+    [switch]$Optimized
 )
 
-Write-Host "Building Music Player H..." -ForegroundColor Green
+Write-Host "🎵 Building Music Player H with .NET 10..." -ForegroundColor Green
 
 # Clean
 dotnet clean
@@ -205,21 +226,32 @@ dotnet build -c $Configuration
 # Publish
 $outputDir = if ($SelfContained) { "./publish-standalone" } else { "./publish" }
 $selfContainedFlag = if ($SelfContained) { "-p:SelfContained=true" } else { "-p:SelfContained=false" }
+$trimFlag = if ($Optimized) { "-p:PublishTrimmed=true -p:TrimMode=link" } else { "" }
+$r2rFlag = if ($Optimized) { "-p:PublishReadyToRun=true" } else { "" }
+
+Write-Host "📦 Publishing to $outputDir..." -ForegroundColor Cyan
 
 dotnet publish -c $Configuration -r $Runtime `
   -p:PublishSingleFile=true `
   $selfContainedFlag `
+  $trimFlag `
+  $r2rFlag `
   -p:EnableCompressionInSingleFile=true `
   -o $outputDir
 
-Write-Host "Publish completed to $outputDir" -ForegroundColor Green
-Write-Host "Output file: $outputDir/music-player-H.exe" -ForegroundColor Cyan
+Write-Host "✅ Publish completed!" -ForegroundColor Green
+Write-Host "📁 Output: $outputDir/music-player-H.exe" -ForegroundColor Cyan
+
+# Show file size
+$fileSize = (Get-Item "$outputDir/music-player-H.exe").Length / 1MB
+Write-Host "📊 File Size: $([math]::Round($fileSize, 2)) MB" -ForegroundColor Yellow
 ```
 
 **اجرا:**
 ```powershell
 .\publish.ps1 -Configuration Release
 .\publish.ps1 -Configuration Release -SelfContained
+.\publish.ps1 -Configuration Release -Optimized
 ```
 
 ### Bash Script برای Linux/Mac
@@ -229,7 +261,7 @@ Write-Host "Output file: $outputDir/music-player-H.exe" -ForegroundColor Cyan
 ```bash
 #!/bin/bash
 
-echo "🎵 Building Music Player H..."
+echo "🎵 Building Music Player H (.NET 10)..."
 
 # Clean
 dotnet clean
@@ -241,15 +273,23 @@ dotnet restore
 dotnet build -c Release
 
 # Publish
-echo "📦 Publishing..."
+echo "📦 Publishing optimized build..."
 dotnet publish -c Release -r win-x64 \
   -p:PublishSingleFile=true \
   -p:SelfContained=false \
+  -p:PublishTrimmed=true \
+  -p:TrimMode=link \
   -p:EnableCompressionInSingleFile=true \
+  -p:PublishReadyToRun=true \
   -o ./publish
 
 echo "✅ Build completed!"
 echo "📁 Output: ./publish/music-player-H.exe"
+
+# Show file size
+if command -v du &> /dev/null; then
+    du -h ./publish/music-player-H.exe
+fi
 ```
 
 **اجرا:**
@@ -262,15 +302,21 @@ chmod +x build.sh
 
 ## عیب‌یابی
 
-### خطا: .NET 6 not found
+### خطا: .NET 10 not found
 
 **راه حل:**
 ```bash
-# نصب .NET 6 SDK
-# Windows: دانلود از https://dotnet.microsoft.com/download/dotnet/6.0
+# نصب .NET 10 SDK
+# Windows: دانلود از https://dotnet.microsoft.com/download/dotnet/10.0
 # یا با winget:
-winget install Microsoft.DotNet.SDK.6
+winget install Microsoft.DotNet.SDK.10
 ```
+
+### خطا: Visual Studio version too old
+
+**راه حل:**
+- Visual Studio 2026 نسخه 17.12 یا بالاتر نصب کنید
+- یا از Visual Studio 2022 با آخرین آپدیت استفاده کنید
 
 ### خطا: NuGet packages not restoring
 
@@ -289,9 +335,9 @@ dotnet restore --force
 1. بررسی کنید تمام PackageReferenceها در `.csproj` وجود دارند
 2. اجرای دستی:
    ```bash
-   dotnet add package NAudio
-   dotnet add package TagLibSharp
-   dotnet add package Newtonsoft.Json
+   dotnet add package NAudio --version 2.2.1
+   dotnet add package TagLibSharp --version 2.3.0
+   dotnet add package Newtonsoft.Json --version 13.0.3
    ```
 
 ### خطا: Publish creates multiple files
@@ -303,21 +349,30 @@ dotnet restore --force
 
 **راه حل:**
 - از `-p:EnableCompressionInSingleFile=true` استفاده کنید
-- یا از Trimmed publish استفاده کنید:
+- از Trimmed publish استفاده کنید:
   ```bash
-  -p:PublishTrimmed=true
+  -p:PublishTrimmed=true -p:TrimMode=link
   ```
+- از ReadyToRun استفاده نکنید (حجم را افزایش می‌دهد)
+
+### خطا: Trim warnings
+
+**راه حل:**
+برخی کتابخانه‌ها ممکن است با Trim سازگار نباشند. می‌توانید:
+```bash
+-p:SuppressTrimAnalysisWarnings=true
+```
 
 ---
 
-## مقایسه انواع پابلیش
+## مقایسه انواع پابلیش (.NET 10)
 
-| نوع | حجم | سرعت اجرا | نیاز به .NET | توصیه برای |
-|-----|-----|-----------|--------------|------------|
-| Framework-Dependent | 10-15MB | سریع | ✅ دارد | کاربران عمومی |
-| Self-Contained | 60-80MB | سریع | ❌ ندارد | سیستم‌های بدون .NET |
-| Single File | 15-20MB | متوسط | ✅ دارد | توزیع آسان |
-| Trimmed | 30-40MB | سریع | ❌ ندارد | بهینه‌سازی حجم |
+| نوع | حجم | سرعت اجرا | نیاز به .NET 10 | توصیه برای |
+|-----|-----|-----------|----------------|------------|
+| Framework-Dependent | 8-12MB | بسیار سریع | ✅ دارد | کاربران عمومی |
+| Self-Contained | 50-70MB | بسیار سریع | ❌ ندارد | سیستم‌های بدون .NET |
+| Single File + Trim | 30-40MB | سریع | ❌ ندارد | توزیع آسان |
+| Optimized (R2R+Trim) | 35-45MB | فوق‌العاده سریع | ❌ ندارد | بهترین Performance |
 
 ---
 
@@ -325,26 +380,31 @@ dotnet restore --force
 
 1. **همیشه قبل از پابلیش نهایی، تست کنید**
 2. **از Configuration Release استفاده کنید**
-3. **برنامه را روی سیستم‌های مختلف تست کنید**
-4. **فایل PDB را برای دیباگ نگه دارید**
+3. **برنامه را روی سیستم‌های مختلف تست کنید** (ویندوز 10, 11, 12)
+4. **فایل PDB را برای دیباگ نگه دارید** (در صورت نیاز)
 5. **ورژن برنامه را در AssemblyInfo.cs بروزرسانی کنید**
+6. **از .NET 10 Features استفاده کنید** (LangVersion=preview)
 
 ---
 
 ## چک‌لیست قبل از انتشار
 
-- [ ] بیلد بدون خطا
+- [ ] بیلد بدون خطا و هشدار
 - [ ] تمام ویژگی‌ها تست شده‌اند
 - [ ] ورژن برنامه بروزرسانی شده
 - [ ] README بروزرسانی شده
 - [ ] فایل‌های اضافی حذف شده‌اند
-- [ ] روی ویندوز 10 و 11 تست شده
-- [ ] فایل نصبی/اجرایی کار می‌کند
+- [ ] روی ویندوز 10، 11 و 12 تست شده
+- [ ] فایل اجرایی کار می‌کند
+- [ ] یکپارچگی با TrafficWatch بررسی شده
+- [ ] تنظیمات چندزبانه تست شده
 
 ---
 
-**نسخه سند:** 1.0  
+**نسخه سند:** 2.0  
 **تاریخ:** 2024  
+**فریم‌ورک:** .NET 10.0  
+**IDE:** Visual Studio 2026  
 **تهیه شده برای:** Music Player H Development Team
 
 </div>

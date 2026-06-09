@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -17,12 +17,21 @@
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
     <NeutralLanguage>fa-IR</NeutralLanguage>
     
+    <!-- .NET 10 & Visual Studio 2026 Optimizations -->
+    <LangVersion>preview</LangVersion>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <TrimMode>link</TrimMode>
+    <PublishTrimmed>true</PublishTrimmed>
+    
     <!-- Publish Settings -->
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <PublishReadyToRun>true</PublishReadyToRun>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    
+    <!-- WPF Optimization -->
+    <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
